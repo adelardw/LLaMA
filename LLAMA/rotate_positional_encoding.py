@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
 
-
-
-class RotationPositionEncoding(nn.Module):
+class RotatePositionEncoding(nn.Module):
     def __init__(self, embedding_dim, seq_len):
         super().__init__()
 
@@ -19,9 +17,14 @@ class RotationPositionEncoding(nn.Module):
     
     def forward(self, x):
 
+        cos = torch.cos(self.pe)
+        sin = torch.sin(self.pe)
+        even = x[:, :, ::2]
+        odd = x[:, :, 1::2]
+        
+        position_one = even* cos - odd*sin
+        position_two =  odd* cos + even*sin
 
-        position_one = x[:, :, ::2]* torch.cos(self.pe) - x[:, :, 1::2]*torch.sin(self.pe)
-        position_two =  x[:, :, 1::2]* torch.cos(self.pe) + x[:, :, ::2]*torch.sin(self.pe)
 
         rotate_position_encoding = torch.cat([position_one, position_two], dim=-1)
 
